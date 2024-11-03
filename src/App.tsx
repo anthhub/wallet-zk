@@ -10,6 +10,10 @@ import { useTokens } from "./hooks/useTokens";
 import { useNFTs } from "./hooks/useNFTs";
 import type { WalletState } from "./types/wallet";
 import { ViewMnemonic } from "./components/ViewMnemonic";
+import { PinSetup } from './components/PinSetup';
+import { DappPermissionDialog } from './components/DappPermission';
+import { checkPermission, savePermission } from './lib/permissions';
+import { storeSecureData } from './lib/crypto';
 
 function App() {
   const [showMnemonic, setShowMnemonic] = useState(false);
@@ -24,6 +28,9 @@ function App() {
     nfts: [],
   });
   const [showImport, setShowImport] = useState(false);
+  const [pin, setPin] = useState<string | null>(null);
+  const [showPinSetup, setShowPinSetup] = useState(false);
+  const [pendingPermission, setPendingPermission] = useState<string | null>(null);
 
   const { tokens, loading: tokensLoading } = useTokens(
     wallet.address,
@@ -58,8 +65,23 @@ function App() {
     }
   }, [nfts]);
 
+  useEffect(() => {
+    const hasPin = localStorage.getItem('has_pin');
+    if (!hasPin) {
+      setShowPinSetup(true);
+    }
+  }, []);
+
   const handleCreateWallet = () => {
+    if (!pin) {
+      setShowPinSetup(true);
+      return;
+    }
+    
     const newWallet = generateWallet();
+    storeSecureData("mnemonic", newWallet.mnemonic, pin);
+    storeSecureData("privateKey", newWallet.privateKey, pin);
+    
     setWallet((prev) => ({
       ...prev,
       address: newWallet.address,
@@ -84,6 +106,23 @@ function App() {
 
   const handleNetworkChange = (network: WalletState["network"]) => {
     setWallet((prev) => ({ ...prev, network }));
+  };
+
+  const handlePinSet = (newPin: string) => {
+    setPin(newPin);
+    localStorage.setItem('has_pin', 'true');
+    setShowPinSetup(false);
+  };
+
+  const handlePermissionRequest = (origin: string) => {
+    if (!checkPermission(origin, 'viewAddress')) {
+      setPendingPermission(origin);
+    }
+  };
+
+  const handlePermissionApprove = (permission: DappPermission) => {
+    savePermission(permission);
+    setPendingPermission(null);
   };
 
   return (
@@ -184,6 +223,21 @@ function App() {
 
         {showMnemonic && (
           <ViewMnemonic onClose={() => setShowMnemonic(false)} />
+        )}
+
+        {showPinSetup && (
+          <PinSetup 
+            onPinSet={handlePinSet}
+            onClose={() => setShowPinSetup(false)}
+          />
+        )}
+
+        {pendingPermission && (
+          <DappPermissionDialog
+            origin={pendingPermission}
+            onApprove={handlePermissionApprove}
+            onReject={() => setPendingPermission(null)}
+          />
         )}
       </main>
     </div>
