@@ -10,10 +10,11 @@ import { useTokens } from "./hooks/useTokens";
 import { useNFTs } from "./hooks/useNFTs";
 import type { WalletState } from "./types/wallet";
 import { ViewMnemonic } from "./components/ViewMnemonic";
-import { PinSetup } from './components/PinSetup';
-import { DappPermissionDialog } from './components/DappPermission';
-import { checkPermission, savePermission } from './lib/permissions';
-import { storeSecureData } from './lib/crypto';
+import { PinSetup } from "./components/PinSetup";
+import { DappPermissionDialog } from "./components/DappPermission";
+import { checkPermission, savePermission } from "./lib/permissions";
+import { storeSecureData } from "./lib/crypto";
+import { AccountManager } from "./components/AccountManager";
 
 function App() {
   const [showMnemonic, setShowMnemonic] = useState(false);
@@ -30,7 +31,10 @@ function App() {
   const [showImport, setShowImport] = useState(false);
   const [pin, setPin] = useState<string | null>(null);
   const [showPinSetup, setShowPinSetup] = useState(false);
-  const [pendingPermission, setPendingPermission] = useState<string | null>(null);
+  const [pendingPermission, setPendingPermission] = useState<string | null>(
+    null
+  );
+  const [isCreatingWallet, setIsCreatingWallet] = useState(false);
 
   const { tokens, loading: tokensLoading } = useTokens(
     wallet.address,
@@ -42,14 +46,18 @@ function App() {
   );
 
   useEffect(() => {
-    const storedWallet = getStoredWallet();
-    if (storedWallet) {
-      setWallet((prev) => ({
-        ...prev,
-        address: storedWallet.address,
-        privateKey: storedWallet.privateKey,
-        mnemonic: storedWallet.mnemonic,
-      }));
+    const storedPin = localStorage.getItem("wallet_pin");
+    if (storedPin) {
+      setPin(storedPin);
+      const storedWallet = getStoredWallet(storedPin);
+      if (storedWallet) {
+        setWallet((prev) => ({
+          ...prev,
+          address: storedWallet.address,
+          privateKey: storedWallet.privateKey,
+          mnemonic: storedWallet.mnemonic,
+        }));
+      }
     }
   }, []);
 
@@ -65,29 +73,35 @@ function App() {
     }
   }, [nfts]);
 
-  useEffect(() => {
-    const hasPin = localStorage.getItem('has_pin');
-    if (!hasPin) {
-      setShowPinSetup(true);
-    }
-  }, []);
-
   const handleCreateWallet = () => {
-    if (!pin) {
-      setShowPinSetup(true);
-      return;
+    setIsCreatingWallet(true);
+    setShowPinSetup(true);
+  };
+
+  const handlePinSet = (newPin: string) => {
+    setPin(newPin);
+    localStorage.setItem("wallet_pin", newPin);
+
+    if (isCreatingWallet) {
+      const newWallet = generateWallet(newPin);
+      setWallet((prev) => ({
+        ...prev,
+        address: newWallet.address,
+        privateKey: newWallet.privateKey,
+        mnemonic: newWallet.mnemonic,
+      }));
+      setIsCreatingWallet(false);
     }
-    
-    const newWallet = generateWallet();
-    storeSecureData("mnemonic", newWallet.mnemonic, pin);
-    storeSecureData("privateKey", newWallet.privateKey, pin);
-    
-    setWallet((prev) => ({
-      ...prev,
-      address: newWallet.address,
-      privateKey: newWallet.privateKey,
-      mnemonic: newWallet.mnemonic,
-    }));
+    setShowPinSetup(false);
+  };
+
+  const handleStartImport = () => {
+    if (pin) {
+      setShowImport(true);
+    } else {
+      setShowPinSetup(true);
+      setShowImport(true);
+    }
   };
 
   const handleImportWallet = (importedWallet: {
@@ -108,14 +122,8 @@ function App() {
     setWallet((prev) => ({ ...prev, network }));
   };
 
-  const handlePinSet = (newPin: string) => {
-    setPin(newPin);
-    localStorage.setItem('has_pin', 'true');
-    setShowPinSetup(false);
-  };
-
   const handlePermissionRequest = (origin: string) => {
-    if (!checkPermission(origin, 'viewAddress')) {
+    if (!checkPermission(origin, "viewAddress")) {
       setPendingPermission(origin);
     }
   };
@@ -123,6 +131,25 @@ function App() {
   const handlePermissionApprove = (permission: DappPermission) => {
     savePermission(permission);
     setPendingPermission(null);
+  };
+
+  const handleDeleteAccount = () => {
+    localStorage.removeItem("mnemonic");
+    localStorage.removeItem("privateKey");
+    localStorage.removeItem("has_pin");
+    localStorage.removeItem("wallet_pin");
+
+    setWallet({
+      address: null,
+      mnemonic: null,
+      privateKey: null,
+      balance: 0n,
+      network: "mainnet",
+      connected: false,
+      tokens: [],
+      nfts: [],
+    });
+    setPin(null);
   };
 
   return (
@@ -137,23 +164,19 @@ function App() {
           <div className="text-center">
             <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md mx-auto">
               <Shield className="h-16 w-16 mx-auto text-blue-400 mb-4" />
-              <h2 className="text-2xl font-bold mb-4">
-                Welcome to Web3 Wallet
-              </h2>
-              <p className="text-gray-400 mb-6">
-                Create or import your wallet to get started
-              </p>
+              <h2 className="text-2xl font-bold mb-4">欢迎使用 Web3 钱包</h2>
+              <p className="text-gray-400 mb-6">创建或导入钱包开始使用</p>
               <button
                 onClick={handleCreateWallet}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
               >
-                Create New Wallet
+                创建新钱包
               </button>
               <button
-                onClick={() => setShowImport(true)}
+                onClick={handleStartImport}
                 className="w-full mt-4 border border-blue-500 text-blue-500 hover:bg-blue-500/10 font-bold py-2 px-4 rounded-lg transition-colors"
               >
-                Import Existing Wallet
+                导入已有钱包
               </button>
             </div>
           </div>
@@ -184,19 +207,10 @@ function App() {
             <div className="bg-gray-800 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold">账户</h2>
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() => setShowMnemonic(true)}
-                    className="flex items-center space-x-2 px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm"
-                  >
-                    <KeyRound className="h-4 w-4" />
-                    <span>查看助记词</span>
-                  </button>
-                  <div className="flex items-center space-x-2">
-                    <span className="inline-flex h-2 w-2 rounded-full bg-green-400"></span>
-                    <span className="text-sm text-gray-400">已连接</span>
-                  </div>
-                </div>
+                <AccountManager
+                  onDeleteAccount={handleDeleteAccount}
+                  onViewMnemonic={() => setShowMnemonic(true)}
+                />
               </div>
               {/* 其他钱包信息... */}
             </div>
@@ -214,21 +228,26 @@ function App() {
           </div>
         )}
 
-        {showImport && (
+        {showImport && pin && (
           <ImportWallet
             onImport={handleImportWallet}
             onClose={() => setShowImport(false)}
+            pin={pin}
           />
         )}
 
-        {showMnemonic && (
-          <ViewMnemonic onClose={() => setShowMnemonic(false)} />
+        {showMnemonic && pin && (
+          <ViewMnemonic pin={pin} onClose={() => setShowMnemonic(false)} />
         )}
 
         {showPinSetup && (
-          <PinSetup 
+          <PinSetup
             onPinSet={handlePinSet}
-            onClose={() => setShowPinSetup(false)}
+            onClose={() => {
+              setShowPinSetup(false);
+              setIsCreatingWallet(false);
+              setShowImport(false);
+            }}
           />
         )}
 

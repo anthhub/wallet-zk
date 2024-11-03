@@ -8,7 +8,7 @@ export interface EncryptedData {
 
 // 生成随机盐值
 function generateSalt(): string {
-  const randomBytes = new Uint8Array(16);
+  const randomBytes = new Uint8Array(32);
   crypto.getRandomValues(randomBytes);
   return Array.from(randomBytes)
     .map((b) => b.toString(16).padStart(2, "0"))
@@ -21,7 +21,7 @@ function deriveKey(pin: string, salt: string): CryptoJS.lib.WordArray {
 
   return CryptoJS.PBKDF2(pin, saltWordArray, {
     keySize: 256 / 32,
-    iterations: 10000,
+    iterations: 100000,
     hasher: CryptoJS.algo.SHA256,
   });
 }
@@ -65,7 +65,13 @@ export function decryptData(encryptedData: EncryptedData, pin: string): string {
       padding: CryptoJS.pad.Pkcs7,
     });
 
-    return decrypted.toString(CryptoJS.enc.Utf8);
+    const result = decrypted.toString(CryptoJS.enc.Utf8);
+
+    if (!result) {
+      throw new Error("PIN码错误或数据已损坏");
+    }
+
+    return result;
   } catch (error) {
     console.error("解密失败:", error);
     throw new Error("解密失败，请检查PIN码是否正确");
@@ -74,17 +80,25 @@ export function decryptData(encryptedData: EncryptedData, pin: string): string {
 
 // 安全存储
 export function storeSecureData(key: string, data: string, pin: string): void {
+  if (!data || !pin) {
+    throw new Error("数据和PIN码不能为空");
+  }
+
   try {
     const encrypted = encryptData(data, pin);
     localStorage.setItem(key, JSON.stringify(encrypted));
   } catch (error) {
     console.error("存储加密数据失败:", error);
-    throw new Error("存储加密数据失败");
+    throw new Error("存储加密数据失败，请重试");
   }
 }
 
 // 安全读取
 export function getSecureData(key: string, pin: string): string | null {
+  if (!key || !pin) {
+    throw new Error("密钥和PIN码不能为空");
+  }
+
   try {
     const stored = localStorage.getItem(key);
     if (!stored) return null;
@@ -92,7 +106,10 @@ export function getSecureData(key: string, pin: string): string | null {
     const encrypted = JSON.parse(stored) as EncryptedData;
     return decryptData(encrypted, pin);
   } catch (error) {
-    console.error("读取加密数据失败:", error);
-    return null;
+    if (error instanceof SyntaxError) {
+      console.error("存储的数据格式无效:", error);
+      return null;
+    }
+    throw error;
   }
 }

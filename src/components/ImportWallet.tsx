@@ -5,9 +5,10 @@ import { importWalletFromMnemonic } from '../lib/wallet';
 interface ImportWalletProps {
   onImport: (wallet: { address: string; privateKey: string; mnemonic: string }) => void;
   onClose: () => void;
+  pin: string;
 }
 
-export function ImportWallet({ onImport, onClose }: ImportWalletProps) {
+export function ImportWallet({ onImport, onClose, pin }: ImportWalletProps) {
   const [mnemonic, setMnemonic] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -16,9 +17,10 @@ export function ImportWallet({ onImport, onClose }: ImportWalletProps) {
     setError(null);
 
     try {
-      const wallet = importWalletFromMnemonic(mnemonic.trim());
+      const wallet = importWalletFromMnemonic(mnemonic.trim(), pin);
       onImport(wallet);
     } catch (err) {
+      console.error('Import error:', err);
       setError('Invalid mnemonic phrase. Please check and try again.');
     }
   };
