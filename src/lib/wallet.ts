@@ -1,9 +1,9 @@
-import { generateMnemonic, mnemonicToSeedSync } from 'bip39';
-import { HDKey } from 'hdkey';
-import { createWalletClient, http, parseEther } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { mainnet, goerli, sepolia } from 'viem/chains';
-import { storeSecureData, getSecureData } from './crypto';
+import { generateMnemonic, mnemonicToSeedSync } from "bip39";
+import { HDKey } from "@scure/bip32";
+import { createWalletClient, http, parseEther } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { mainnet, goerli, sepolia } from "viem/chains";
+import { storeSecureData, getSecureData } from "./crypto";
 
 export const generateWallet = () => {
   const mnemonic = generateMnemonic();
@@ -12,11 +12,15 @@ export const generateWallet = () => {
   const hdkey = HDKey.fromMasterSeed(seed);
   const childKey = hdkey.derive("m/44'/60'/0'/0/0");
 
-  const privateKey = childKey.privateKey.toString('hex');
+  if (!childKey.privateKey) {
+    throw new Error("无法生成私钥");
+  }
+
+  const privateKey = Buffer.from(childKey.privateKey).toString("hex");
   const account = privateKeyToAccount(`0x${privateKey}`);
 
-  storeSecureData('mnemonic', mnemonic);
-  storeSecureData('privateKey', privateKey);
+  storeSecureData("mnemonic", mnemonic);
+  storeSecureData("privateKey", privateKey);
 
   return {
     address: account.address,
@@ -30,11 +34,15 @@ export const importWalletFromMnemonic = (mnemonic: string) => {
   const hdkey = HDKey.fromMasterSeed(seed);
   const childKey = hdkey.derive("m/44'/60'/0'/0/0");
 
-  const privateKey = childKey.privateKey.toString('hex');
+  if (!childKey.privateKey) {
+    throw new Error("无法生成私钥");
+  }
+
+  const privateKey = Buffer.from(childKey.privateKey).toString("hex");
   const account = privateKeyToAccount(`0x${privateKey}`);
 
-  storeSecureData('mnemonic', mnemonic);
-  storeSecureData('privateKey', privateKey);
+  storeSecureData("mnemonic", mnemonic);
+  storeSecureData("privateKey", privateKey);
 
   return {
     address: account.address,
@@ -44,8 +52,8 @@ export const importWalletFromMnemonic = (mnemonic: string) => {
 };
 
 export const getStoredWallet = () => {
-  const mnemonic = getSecureData('mnemonic');
-  const privateKey = getSecureData('privateKey');
+  const mnemonic = getSecureData("mnemonic");
+  const privateKey = getSecureData("privateKey");
 
   if (!privateKey) return null;
 
