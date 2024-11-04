@@ -22,6 +22,7 @@ import type { DappPermission } from "./types/permissions";
 import { Loading } from "./components/Loading";
 import { Skeleton } from "./components/Skeleton";
 import { SendModal } from "./components/SendModal";
+import { WalletConnectSession } from "./components/WalletConnectSession";
 
 function App() {
   const { t } = useTranslation();
@@ -147,15 +148,26 @@ function App() {
     setWallet((prev) => ({ ...prev, network }));
   };
 
-  const handlePermissionRequest = (origin: string) => {
-    if (!checkPermission(origin, "viewAddress")) {
-      setPendingPermission(origin);
-    }
+  const handlePermissionApprove = (permission: DappPermission) => {
+    setPendingPermission(null);
+    savePermission(permission);
   };
 
-  const handlePermissionApprove = (permission: DappPermission) => {
-    savePermission(permission);
-    setPendingPermission(null);
+  const handlePermissionRequest = async (origin: string) => {
+    setPendingPermission(origin);
+    return new Promise<boolean>((resolve) => {
+      const handleApprove = (permission: DappPermission) => {
+        handlePermissionApprove(permission);
+        resolve(true);
+      };
+
+      const handleReject = () => {
+        setPendingPermission(null);
+        resolve(false);
+      };
+
+      setPendingPermission(origin);
+    });
   };
 
   const handleDeleteAccount = () => {
@@ -389,6 +401,11 @@ function App() {
           </div>
         </div>
       )} */}
+      <WalletConnectSession
+        address={wallet.address}
+        network={wallet.network}
+        onPermissionRequest={handlePermissionRequest}
+      />
     </div>
   );
 }

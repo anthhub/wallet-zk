@@ -1,9 +1,9 @@
 export interface WalletState {
   address: string | null;
-  mnemonic: string | null;
   privateKey: string | null;
+  mnemonic: string | null;
   balance: bigint;
-  network: 'mainnet' | 'goerli' | 'sepolia';
+  network: string;
   connected: boolean;
   tokens: Token[];
   nfts: NFT[];
@@ -24,4 +24,11 @@ export interface NFT {
     description: string;
     image: string;
   };
+}
+
+export interface TransactionRequest {
+  to: string;
+  value: string;
+  data?: string;
+  from: string;
 }

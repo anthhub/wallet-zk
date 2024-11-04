@@ -33,7 +33,12 @@ export const resources = {
         to: 'To',
         from: 'From',
         noTransactions: 'No transactions found',
-        scanHint: 'Position QR code within frame to scan'
+        scanHint: 'Position QR code within frame to scan',
+        connected: "已连接",
+        connecting: "正在连接",
+        pendingRequest: "等待处理请求...",
+        disconnect: "断开连接",
+        connect: "连接钱包"
       },
       error: {
         invalidAddress: 'Invalid address',
@@ -91,7 +96,12 @@ export const resources = {
         to: '到',
         from: '从',
         noTransactions: '没有找到交易',
-        scanHint: '将二维码置于框架内扫描'
+        scanHint: '将二维码置于框架内扫描',
+        connected: "已连接",
+        connecting: "正在连接",
+        pendingRequest: "等待处理请求...",
+        disconnect: "断开连接",
+        connect: "连接钱包"
       },
       error: {
         invalidAddress: '无效地址',
