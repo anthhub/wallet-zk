@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { KeyRound, Shield } from "lucide-react";
+import { KeyRound, Shield, Send, Download, Scan, History } from "lucide-react";
 import { generateWallet, getStoredWallet } from "./lib/wallet";
 import { WalletHeader } from "./components/WalletHeader";
 import { TokenList } from "./components/TokenList";
@@ -15,8 +15,16 @@ import { DappPermissionDialog } from "./components/DappPermission";
 import { checkPermission, savePermission } from "./lib/permissions";
 import { storeSecureData } from "./lib/crypto";
 import { AccountManager } from "./components/AccountManager";
+import { useTranslation } from "react-i18next";
+import { QuickActionButton } from "./components/QuickActionButton";
+import { LanguageSelector } from "./components/LanguageSelector";
+import type { DappPermission } from "./types/permissions";
+import { Loading } from "./components/Loading";
+import { Skeleton } from "./components/Skeleton";
+import { SendModal } from "./components/SendModal";
 
 function App() {
+  const { t } = useTranslation();
   const [showMnemonic, setShowMnemonic] = useState(false);
   const [wallet, setWallet] = useState<WalletState>({
     address: null,
@@ -35,6 +43,12 @@ function App() {
     null
   );
   const [isCreatingWallet, setIsCreatingWallet] = useState(false);
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [showReceiveModal, setShowReceiveModal] = useState(false);
+  const [showScanModal, setShowScanModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   const { tokens, loading: tokensLoading } = useTokens(
     wallet.address,
@@ -46,19 +60,29 @@ function App() {
   );
 
   useEffect(() => {
-    const storedPin = localStorage.getItem("wallet_pin");
-    if (storedPin) {
-      setPin(storedPin);
-      const storedWallet = getStoredWallet(storedPin);
-      if (storedWallet) {
-        setWallet((prev) => ({
-          ...prev,
-          address: storedWallet.address,
-          privateKey: storedWallet.privateKey,
-          mnemonic: storedWallet.mnemonic,
-        }));
+    const initializeWallet = async () => {
+      try {
+        const storedPin = localStorage.getItem("wallet_pin");
+        if (storedPin) {
+          setPin(storedPin);
+          const storedWallet = getStoredWallet(storedPin);
+          if (storedWallet) {
+            setWallet((prev) => ({
+              ...prev,
+              address: storedWallet.address,
+              privateKey: storedWallet.privateKey,
+              mnemonic: storedWallet.mnemonic,
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("初始化钱包失败:", error);
+      } finally {
+        setIsInitializing(false);
       }
-    }
+    };
+
+    initializeWallet();
   }, []);
 
   useEffect(() => {
@@ -73,7 +97,8 @@ function App() {
     }
   }, [nfts]);
 
-  const handleCreateWallet = () => {
+  const handleCreateWallet = async () => {
+    setIsLoading(true);
     setIsCreatingWallet(true);
     setShowPinSetup(true);
   };
@@ -152,78 +177,141 @@ function App() {
     setPin(null);
   };
 
+  const handleSendTransaction = async (to: string, amount: string) => {
+    try {
+      // TODO: 实现发送交易逻辑
+      setShowSendModal(false);
+    } catch (error) {
+      console.error("发送交易失败:", error);
+    }
+  };
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <div className="max-w-md mx-auto px-4 py-6">
+          <div className="bg-gray-900 p-8 rounded-2xl shadow-xl">
+            <div className="space-y-4">
+              <Skeleton className="h-16 w-16 mx-auto rounded-full" />
+              <Skeleton className="h-8 w-3/4 mx-auto" />
+              <Skeleton className="h-4 w-2/3 mx-auto" />
+              <div className="pt-4">
+                <Skeleton className="h-12 w-full" />
+                <div className="h-4" />
+                <Skeleton className="h-12 w-full" />
+              </div>
+            </div>
+            <div className="flex justify-center mt-8">
+              <Loading size="lg" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen bg-black text-white">
       <WalletHeader
         network={wallet.network}
         onNetworkChange={handleNetworkChange}
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-md mx-auto px-4 py-6">
         {!wallet.address ? (
           <div className="text-center">
-            <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md mx-auto">
+            <div className="bg-gray-900 p-8 rounded-2xl shadow-xl">
               <Shield className="h-16 w-16 mx-auto text-blue-400 mb-4" />
-              <h2 className="text-2xl font-bold mb-4">欢迎使用 Web3 钱包</h2>
-              <p className="text-gray-400 mb-6">创建或导入钱包开始使用</p>
-              <button
-                onClick={handleCreateWallet}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
-              >
-                创建新钱包
-              </button>
-              <button
-                onClick={handleStartImport}
-                className="w-full mt-4 border border-blue-500 text-blue-500 hover:bg-blue-500/10 font-bold py-2 px-4 rounded-lg transition-colors"
-              >
-                导入已有钱包
-              </button>
+              <h2 className="text-2xl font-bold mb-4">{t("welcome.title")}</h2>
+              <p className="text-gray-400 mb-6">{t("welcome.subtitle")}</p>
+
+              <div className="flex items-center justify-center mb-6">
+                <LanguageSelector />
+              </div>
+
+              {isLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <div className="flex justify-center mt-8">
+                    <Loading size="lg" />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={handleCreateWallet}
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl mb-4 transition-colors"
+                  >
+                    {t("welcome.createWallet")}
+                  </button>
+                  <button
+                    onClick={handleStartImport}
+                    className="w-full border border-blue-500 text-blue-500 hover:bg-blue-500/10 font-bold py-3 px-4 rounded-xl transition-colors"
+                  >
+                    {t("welcome.importWallet")}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="bg-gray-800 rounded-lg p-6">
+            <div className="bg-gray-900 rounded-2xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">Account</h2>
-                <div className="flex items-center space-x-2">
-                  <span className="inline-flex h-2 w-2 rounded-full bg-green-400"></span>
-                  <span className="text-sm text-gray-400">Connected</span>
-                </div>
+                <h2 className="text-xl font-bold">{t("wallet.account")}</h2>
+                <LanguageSelector />
               </div>
-              <div className="bg-gray-700 rounded-lg p-4 break-all">
-                <p className="text-sm text-gray-400 mb-1">Address</p>
-                <p className="font-mono">{wallet.address}</p>
+              <div className="bg-gray-800 rounded-xl p-4 break-all">
+                <p className="text-sm text-gray-400 mb-1">
+                  {t("wallet.address")}
+                </p>
+                <p className="font-mono text-sm">{wallet.address}</p>
               </div>
-              <div className="mt-4">
-                <div>
-                  <p className="text-2xl font-bold">
-                    {wallet.balance.toString()} ETH
-                  </p>
-                  <p className="text-sm text-gray-400">Balance</p>
-                </div>
+              <div className="mt-6">
+                <p className="text-3xl font-bold">
+                  ${wallet.balance.toString()} ETH
+                </p>
+                <p className="text-sm text-gray-400">{t("wallet.balance")}</p>
               </div>
-            </div>
-
-            <div className="bg-gray-800 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">账户</h2>
+              
+              <div className="mt-6 pt-6 border-t border-gray-800">
                 <AccountManager
                   onDeleteAccount={handleDeleteAccount}
                   onViewMnemonic={() => setShowMnemonic(true)}
                 />
               </div>
-              {/* 其他钱包信息... */}
             </div>
 
-            <SendTransaction
-              address={wallet.address}
-              balance={wallet.balance}
-              network={wallet.network}
-            />
+            <div className="flex justify-between px-2">
+              <QuickActionButton
+                icon={Send}
+                label="wallet.send"
+                onClick={() => setShowSendModal(true)}
+              />
+              <QuickActionButton
+                icon={Download}
+                label="wallet.receive"
+                onClick={() => setShowReceiveModal(true)}
+              />
+              <QuickActionButton
+                icon={Scan}
+                label="wallet.scan"
+                onClick={() => setShowScanModal(true)}
+              />
+              <QuickActionButton
+                icon={History}
+                label="wallet.history"
+                onClick={() => setShowHistoryModal(true)}
+              />
+            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <TokenList tokens={wallet.tokens} />
-              <NFTGrid nfts={wallet.nfts} />
+            <div className="bg-gray-900 rounded-2xl p-6">
+              <h2 className="text-xl font-bold mb-4">{t("wallet.assets")}</h2>
+              <div className="space-y-4">
+                <TokenList tokens={wallet.tokens} />
+                <NFTGrid nfts={wallet.nfts} />
+              </div>
             </div>
           </div>
         )}
@@ -258,7 +346,49 @@ function App() {
             onReject={() => setPendingPermission(null)}
           />
         )}
+
+        {showSendModal && (
+          <SendModal
+            onClose={() => setShowSendModal(false)}
+            onSend={handleSendTransaction}
+            balance={wallet.balance}
+          />
+        )}
+
+        {showReceiveModal && (
+          <ReceiveModal
+            address={wallet.address}
+            onClose={() => setShowReceiveModal(false)}
+          />
+        )}
+
+        {showScanModal && (
+          <ScanModal
+            onScan={(result) => {
+              // TODO: 处理扫描结果
+              setShowScanModal(false);
+            }}
+            onClose={() => setShowScanModal(false)}
+          />
+        )}
+
+        {showHistoryModal && (
+          <HistoryModal
+            address={wallet.address}
+            network={wallet.network}
+            onClose={() => setShowHistoryModal(false)}
+          />
+        )}
       </main>
+
+      {(tokensLoading || nftsLoading) && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="text-center">
+            <Loading size="lg" />
+            <p className="mt-4 text-gray-400">{t("common.loading")}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

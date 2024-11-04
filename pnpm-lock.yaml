@@ -14,6 +14,12 @@ importers:
       '@types/hdkey':
         specifier: ^2.1.0
         version: 2.1.0
+      '@types/i18next':
+        specifier: ^13.0.0
+        version: 13.0.0
+      '@types/react-i18next':
+        specifier: ^8.1.0
+        version: 8.1.0(i18next@23.11.5)(react-dom@18.3.1(react@18.3.1))(react-native@0.76.1(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)
       '@wagmi/core':
         specifier: ^2.6.5
         version: 2.14.1(@tanstack/query-core@5.59.17)(@types/react@18.3.12)(react@18.3.1)(typescript@5.6.3)(use-sync-external-store@1.2.0(react@18.3.1))(viem@2.21.40(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@5.0.10))
@@ -29,15 +35,27 @@ importers:
       crypto-js:
         specifier: ^4.2.0
         version: 4.2.0
+      i18next:
+        specifier: ^23.11.5
+        version: 23.11.5
       lucide-react:
         specifier: ^0.344.0
         version: 0.344.0(react@18.3.1)
+      qr-scanner:
+        specifier: ^1.4.2
+        version: 1.4.2
+      qrcode.react:
+        specifier: ^3.1.0
+        version: 3.2.0(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      react-i18next:
+        specifier: ^14.1.3
+        version: 14.1.3(i18next@23.11.5)(react-dom@18.3.1(react@18.3.1))(react-native@0.76.1(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)
       viem:
         specifier: ^2.7.15
         version: 2.21.40(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@5.0.10)
@@ -1636,6 +1654,10 @@ packages:
   '@types/hdkey@2.1.0':
     resolution: {integrity: sha512-Mlwd/7y2JRPOoMP5snMKn+/Vvc5ThSDXnSl+EHgHxoE4wDDOFxUT/w75DmRaaI/3JpC5CMkFlO4fkpWGAk7qyA==}
 
+  '@types/i18next@13.0.0':
+    resolution: {integrity: sha512-gp/SIShAuf4WOqi8ey0nuI7qfWaVpMNCcs/xLygrh/QTQIXmlDC1E0TtVejweNW+7SGDY7g0lyxyKZIJuCKIJw==}
+    deprecated: This is a stub types definition. i18next provides its own type definitions, so you do not need this installed.
+
   '@types/istanbul-lib-coverage@2.0.6':
     resolution: {integrity: sha512-2QF/t/auWm0lsy8XtKVPG19v3sSOQlJe/YHZgfjb/KBBHOGSV+J2q/S671rcq9uTBrLAXmZpqJiaQbMT+zNU1w==}
 
@@ -1657,11 +1679,18 @@ packages:
   '@types/node@22.8.7':
     resolution: {integrity: sha512-LidcG+2UeYIWcMuMUpBKOnryBWG/rnmOHQR5apjn8myTQcx3rinFRn7DcIFhMnS0PPFSC6OafdIKEad0lj6U0Q==}
 
+  '@types/offscreencanvas@2019.7.3':
+    resolution: {integrity: sha512-ieXiYmgSRXUDeOntE1InxjWyvEelZGP63M+cGuquuRLuIKKT1osnkXjxev9B7d1nXSug5vpunx+gNlbVxMlC9A==}
+
   '@types/prop-types@15.7.13':
     resolution: {integrity: sha512-hCZTSvwbzWGvhqxp/RqVqwU999pBf2vp7hzIjiYOsl8wqOmUxkQ6ddw1cV3l8811+kdUFus/q4d1Y3E3SyEifA==}
 
   '@types/react-dom@18.3.1':
     resolution: {integrity: sha512-qW1Mfv8taImTthu4KoXgDfLuk4bydU6Q/TkADnDWWHwi4NX4BR+LWfTp2sVmTqRrsHvyDDTelgelxJ+SsejKKQ==}
+
+  '@types/react-i18next@8.1.0':
+    resolution: {integrity: sha512-d4xhcjX5b3roNMObRNMfb1HinHQlQLPo8xlDj60dnHeeAw2bBymR2cy/l1giJpHzo/ZFgSvgVUvIWr4kCrenCg==}
+    deprecated: This is a stub types definition. react-i18next provides its own type definitions, so you do not need this installed.
 
   '@types/react@18.3.12':
     resolution: {integrity: sha512-D2wOSq/d6Agt28q7rSI3jhU7G6aiuzljDGZ2hTZHIkrTLUI+AF3WMeKkEZ9nN2fkBAlcktT6vcZjDFiIhMYEQw==}
@@ -2698,6 +2727,9 @@ packages:
   hmac-drbg@1.0.1:
     resolution: {integrity: sha512-Tti3gMqLdZfhOQY1Mzf/AanLiqh1WTiJgEj26ZuYQ9fbkLomzGchCws4FyrSd4VkpBfiNhaE1On+lOz894jvXg==}
 
+  html-parse-stringify@3.0.1:
+    resolution: {integrity: sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==}
+
   http-errors@2.0.0:
     resolution: {integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==}
     engines: {node: '>= 0.8'}
@@ -3552,12 +3584,20 @@ packages:
     resolution: {integrity: sha512-uxykNuvXaPDK/jGDERDIdDvvocefbHu1oxVYi6K87FUdPPAezkBdcIeFJ8XVX2HSsyLFINile5uzfOMYpGu5ZA==}
     engines: {node: '>=18.18.0'}
 
+  qr-scanner@1.4.2:
+    resolution: {integrity: sha512-kV1yQUe2FENvn59tMZW6mOVfpq9mGxGf8l6+EGaXUOd4RBOLg7tRC83OrirM5AtDvZRpdjdlXURsHreAOSPOUw==}
+
   qrcode-generator@1.4.4:
     resolution: {integrity: sha512-HM7yY8O2ilqhmULxGMpcHSF1EhJJ9yBj8gvDEuZ6M+KGJ0YY2hKpnXvRD+hZPLrDVck3ExIGhmPtSdcjC+guuw==}
 
   qrcode-terminal-nooctal@0.12.1:
     resolution: {integrity: sha512-jy/kkD0iIMDjTucB+5T6KBsnirlhegDH47vHgrj5MejchSQmi/EAMM0xMFeePgV9CJkkAapNakpVUWYgHvtdKg==}
     hasBin: true
+
+  qrcode.react@3.2.0:
+    resolution: {integrity: sha512-YietHHltOHA4+l5na1srdaMx4sVSOjV9tamHs+mwiLWAMr6QVACRUw1Neax5CptFILcNoITctJY0Ipyn5enQ8g==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
 
   qrcode@1.5.3:
     resolution: {integrity: sha512-puyri6ApkEHYiVl4CFzo1tDkAZ+ATcnbJrJ6RiBM1Fhctdn/ix9MTE3hRph33omisEbC/2fcfemsseiKgBPKZg==}
@@ -3591,6 +3631,19 @@ packages:
     resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
     peerDependencies:
       react: ^18.3.1
+
+  react-i18next@14.1.3:
+    resolution: {integrity: sha512-wZnpfunU6UIAiJ+bxwOiTmBOAaB14ha97MjOEnLGac2RJ+h/maIYXZuTHlmyqQVX1UVHmU1YDTQ5vxLmwfXTjw==}
+    peerDependencies:
+      i18next: '>= 23.2.3'
+      react: '>= 16.8.0'
+      react-dom: '*'
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
@@ -4194,6 +4247,10 @@ packages:
 
   vlq@1.0.1:
     resolution: {integrity: sha512-gQpnTgkubC6hQgdIcRdYGDSDc+SaujOdyesZQMv6JlfQee/9Mp0Qhnys6WxDWvQnL5WZdT7o2Ul187aSt0Rq+w==}
+
+  void-elements@3.1.0:
+    resolution: {integrity: sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==}
+    engines: {node: '>=0.10.0'}
 
   wagmi@2.12.25:
     resolution: {integrity: sha512-RdQCDbTv1+b7fWCAoLEYX0loymqLnhmNrMZq1gfPEs6cOhEHYOQeZtJWnyaXOD5+3xIFw+xoA0xDNvAHVbtbKw==}
@@ -6298,6 +6355,10 @@ snapshots:
     dependencies:
       '@types/node': 22.8.7
 
+  '@types/i18next@13.0.0':
+    dependencies:
+      i18next: 23.11.5
+
   '@types/istanbul-lib-coverage@2.0.6': {}
 
   '@types/istanbul-lib-report@3.0.3':
@@ -6320,11 +6381,22 @@ snapshots:
     dependencies:
       undici-types: 6.19.8
 
+  '@types/offscreencanvas@2019.7.3': {}
+
   '@types/prop-types@15.7.13': {}
 
   '@types/react-dom@18.3.1':
     dependencies:
       '@types/react': 18.3.12
+
+  '@types/react-i18next@8.1.0(i18next@23.11.5)(react-dom@18.3.1(react@18.3.1))(react-native@0.76.1(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)':
+    dependencies:
+      react-i18next: 14.1.3(i18next@23.11.5)(react-dom@18.3.1(react@18.3.1))(react-native@0.76.1(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)
+    transitivePeerDependencies:
+      - i18next
+      - react
+      - react-dom
+      - react-native
 
   '@types/react@18.3.12':
     dependencies:
@@ -7926,6 +7998,10 @@ snapshots:
       minimalistic-assert: 1.0.1
       minimalistic-crypto-utils: 1.0.1
 
+  html-parse-stringify@3.0.1:
+    dependencies:
+      void-elements: 3.1.0
+
   http-errors@2.0.0:
     dependencies:
       depd: 2.0.0
@@ -8869,9 +8945,17 @@ snapshots:
     dependencies:
       qrcode-generator: 1.4.4
 
+  qr-scanner@1.4.2:
+    dependencies:
+      '@types/offscreencanvas': 2019.7.3
+
   qrcode-generator@1.4.4: {}
 
   qrcode-terminal-nooctal@0.12.1: {}
+
+  qrcode.react@3.2.0(react@18.3.1):
+    dependencies:
+      react: 18.3.1
 
   qrcode@1.5.3:
     dependencies:
@@ -8912,6 +8996,16 @@ snapshots:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
+
+  react-i18next@14.1.3(i18next@23.11.5)(react-dom@18.3.1(react@18.3.1))(react-native@0.76.1(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1):
+    dependencies:
+      '@babel/runtime': 7.26.0
+      html-parse-stringify: 3.0.1
+      i18next: 23.11.5
+      react: 18.3.1
+    optionalDependencies:
+      react-dom: 18.3.1(react@18.3.1)
+      react-native: 0.76.1(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10)
 
   react-is@18.3.1: {}
 
@@ -9536,6 +9630,8 @@ snapshots:
       terser: 5.36.0
 
   vlq@1.0.1: {}
+
+  void-elements@3.1.0: {}
 
   wagmi@2.12.25(@tanstack/query-core@5.59.17)(@tanstack/react-query@5.59.19(react@18.3.1))(@types/react@18.3.12)(bufferutil@4.0.8)(react-dom@18.3.1(react@18.3.1))(react-native@0.76.1(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@types/react@18.3.12)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.6.3)(utf-8-validate@5.0.10)(viem@2.21.40(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@5.0.10)):
     dependencies:

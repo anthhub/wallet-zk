@@ -18,7 +18,10 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    "types": ["node", "qrcode.react", "qr-scanner", "i18next", "react-i18next"],
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": ["src"]
 }
