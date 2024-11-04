@@ -56,7 +56,17 @@ function App() {
     });
   };
 
-  useWalletConnectHandler(wallet, handlePermissionRequest);
+  const { handleUri } = useWalletConnectHandler({
+    wallet,
+    handlePermissionRequest: async (origin) => {
+      // 实现权限请求处理逻辑
+      return window.confirm(`Allow connection from ${origin}?`);
+    },
+    onNetworkChange: (network) => {
+      // 处理网络变更
+      console.log("Network changed to:", network);
+    },
+  });
 
   // 更新代币和 NFT 数据
   useEffect(() => {

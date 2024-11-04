@@ -1,8 +1,6 @@
 import { generateMnemonic, mnemonicToSeedSync } from "bip39";
 import { HDKey } from "@scure/bip32";
-import { createWalletClient, http, parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { mainnet, goerli, sepolia } from "viem/chains";
 import { storeSecureData, getSecureData } from "./crypto";
 
 export const generateWallet = (pin: string) => {
@@ -36,7 +34,7 @@ export const importWalletFromMnemonic = (mnemonic: string, pin: string) => {
     }
 
     // 验证助记词格式
-    const words = mnemonic.trim().split(' ');
+    const words = mnemonic.trim().split(" ");
     if (words.length !== 12 && words.length !== 24) {
       throw new Error("助记词必须是12个或24个单词");
     }

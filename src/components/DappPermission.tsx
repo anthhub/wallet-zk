@@ -1,6 +1,4 @@
-import React from 'react';
-import { Shield, X } from 'lucide-react';
-import type { DappPermission } from '../lib/permissions';
+import type { DappPermission } from "../lib/permissions";
 
 interface DappPermissionDialogProps {
   origin: string;
@@ -12,7 +10,12 @@ interface DappPermissionDialogProps {
   onReject: () => void;
 }
 
-export function DappPermissionDialog({ origin, metadata, onApprove, onReject }: DappPermissionDialogProps) {
+export function DappPermissionDialog({
+  origin,
+  metadata,
+  onApprove,
+  onReject,
+}: DappPermissionDialogProps) {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-gray-800 rounded-lg p-6">
@@ -23,21 +26,25 @@ export function DappPermissionDialog({ origin, metadata, onApprove, onReject }: 
         </div>
         <div className="flex mt-4">
           <button onClick={onReject}>拒绝</button>
-          <button onClick={() => onApprove({
-            origin,
-            permissions: {
-              viewAddress: true,
-              sign: false,
-              viewBalance: false,
-              transactionLimit: "0"
-            },
-            approved: true,
-            timestamp: Date.now()
-          })}>
+          <button
+            onClick={() =>
+              onApprove({
+                origin,
+                permissions: {
+                  viewAddress: true,
+                  sign: false,
+                  viewBalance: false,
+                  transactionLimit: "0",
+                },
+                approved: true,
+                timestamp: Date.now(),
+              })
+            }
+          >
             允许
           </button>
         </div>
       </div>
     </div>
   );
-} 
+}
