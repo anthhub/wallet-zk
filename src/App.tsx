@@ -25,18 +25,43 @@ import { SendModal } from "./components/SendModal";
 import { WalletConnectSession } from "./components/WalletConnectSession";
 import { useWalletConnect } from "./hooks/useWalletConnect";
 
+// 新增函数用于获取存储的钱包信息
+function getStoredWalletInfo() {
+  try {
+    const address = localStorage.getItem("wallet_address");
+    const publicKey = localStorage.getItem("wallet_public_key");
+    
+    if (address && publicKey) {
+      return {
+        address,
+        publicKey,
+        network: localStorage.getItem("wallet_network") || "mainnet"
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error("获取存储的钱包信息失败:", error);
+    return null;
+  }
+}
+
 function App() {
   const { t } = useTranslation();
   const [showMnemonic, setShowMnemonic] = useState(false);
-  const [wallet, setWallet] = useState<WalletState>({
-    address: null,
-    mnemonic: null,
-    privateKey: null,
-    balance: 0n,
-    network: "mainnet",
-    connected: false,
-    tokens: [],
-    nfts: [],
+  const [wallet, setWallet] = useState<WalletState>(() => {
+    // 初始化时检查是否有存储的钱包信息
+    const storedWallet = getStoredWalletInfo();
+    return {
+      address: storedWallet?.address || null,
+      publicKey: storedWallet?.publicKey || null,
+      privateKey: null, // 私钥不存储在本地
+      mnemonic: null,   // 助记词不存储在本地
+      balance: 0n,
+      network: storedWallet?.network || "mainnet",
+      connected: false,
+      tokens: [],
+      nfts: [],
+    };
   });
   const [showImport, setShowImport] = useState(false);
   const [pin, setPin] = useState<string | null>(null);
@@ -64,17 +89,16 @@ function App() {
   useEffect(() => {
     const initializeWallet = async () => {
       try {
-        // 不再从 localStorage 获取 PIN
-        const storedEncryptedData = localStorage.getItem("mnemonic");
-        if (storedEncryptedData) {
-          // 等待用户输入 PIN 进行解密
-          setShowPinSetup(false);
+        const storedWallet = getStoredWalletInfo();
+        if (storedWallet) {
+          // 如果有存储的钱包信息,直接展示钱包详情页面
+          setIsInitializing(false);
         } else {
+          // 没有钱包信息,展示创建钱包页面
           setIsInitializing(false);
         }
       } catch (error) {
         console.error("初始化钱包失败:", error);
-      } finally {
         setIsInitializing(false);
       }
     };
@@ -95,7 +119,6 @@ function App() {
   }, [nfts]);
 
   const handleCreateWallet = async () => {
-    // setIsLoading(true);
     setIsCreatingWallet(true);
     setShowPinSetup(true);
   };
@@ -105,11 +128,17 @@ function App() {
 
     if (isCreatingWallet) {
       const newWallet = generateWallet(newPin);
-      setWallet((prev) => ({
+      // 存储公开信息到 localStorage
+      localStorage.setItem("wallet_address", newWallet.address);
+      localStorage.setItem("wallet_public_key", newWallet.publicKey);
+      localStorage.setItem("wallet_network", wallet.network);
+
+      setWallet(prev => ({
         ...prev,
         address: newWallet.address,
-        privateKey: newWallet.privateKey,
-        mnemonic: newWallet.mnemonic,
+        publicKey: newWallet.publicKey,
+        privateKey: newWallet.privateKey, // 仅保存在内存中
+        mnemonic: newWallet.mnemonic,    // 仅保存在内存中
       }));
       setIsCreatingWallet(false);
     }
@@ -166,13 +195,16 @@ function App() {
   };
 
   const handleDeleteAccount = () => {
-    localStorage.removeItem("mnemonic");
-    localStorage.removeItem("privateKey");
+    // 清除所有本地存储的钱包信息
+    localStorage.removeItem("wallet_address");
+    localStorage.removeItem("wallet_public_key");
+    localStorage.removeItem("wallet_network");
 
     setWallet({
       address: null,
-      mnemonic: null,
+      publicKey: null,
       privateKey: null,
+      mnemonic: null,
       balance: 0n,
       network: "mainnet",
       connected: false,
