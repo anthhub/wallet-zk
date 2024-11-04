@@ -10,71 +10,8 @@ import { LoadingScreen } from "./components/LoadingScreen";
 import { WelcomeScreen } from "./components/WelcomeScreen";
 import { WalletDashboard } from "./components/WalletDashboard";
 import { ModalsContainer } from "./components/ModalsContainer";
-
-// 抽取钱包存储逻辑到自定义 hook
-function useWalletStorage() {
-  const getStoredInfo = () => {
-    try {
-      return {
-        address: localStorage.getItem("wallet_address"),
-        network: localStorage.getItem("wallet_network") || "mainnet",
-      };
-    } catch (error) {
-      console.error("获取存储的钱包信息失败:", error);
-      return null;
-    }
-  };
-
-  const clearStorage = () => {
-    localStorage.removeItem("wallet_address");
-    localStorage.removeItem("wallet_network");
-  };
-
-  const saveStorage = (address: string, network: string) => {
-    localStorage.setItem("wallet_address", address);
-    localStorage.setItem("wallet_network", network);
-  };
-
-  return {
-    getStoredInfo,
-    clearStorage,
-    saveStorage,
-  };
-}
-
-// 抽取 WalletConnect 相关逻辑
-function useWalletConnectHandler(
-  wallet: WalletState,
-  handlePermissionRequest: (origin: string) => Promise<boolean>
-) {
-  useEffect(() => {
-    const handleUri = async (uri: string) => {
-      if (!uri.startsWith("wc:")) return;
-
-      if (!wallet.address) {
-        localStorage.setItem("pending_wc_uri", uri);
-        return;
-      }
-
-      try {
-        // 处理 WalletConnect 连接
-        // TODO: 实现具体连接逻辑
-      } catch (error) {
-        console.error("WalletConnect 连接失败:", error);
-      }
-    };
-
-    const params = new URLSearchParams(window.location.search);
-    const uri = params.get("wc");
-    if (uri) handleUri(uri);
-
-    const pendingUri = localStorage.getItem("pending_wc_uri");
-    if (pendingUri && wallet.address) {
-      handleUri(pendingUri);
-      localStorage.removeItem("pending_wc_uri");
-    }
-  }, [wallet.address]);
-}
+import { useWalletStorage } from "./hooks/useWalletStorage";
+import { useWalletConnectHandler } from "./hooks/useWalletConnectHandler";
 
 function App() {
   const { t } = useTranslation();
