@@ -1,6 +1,6 @@
-import { encrypt, decrypt } from './crypto';
 import { ethers } from 'ethers';
 import { checkPermission } from './permissions';
+import { decryptData } from './crypto';
 
 interface TransactionParams {
   to: string;
@@ -15,9 +15,8 @@ interface TransactionParams {
 async function getPrivateKey(pin: string): Promise<string> {
   const encrypted = localStorage.getItem('encrypted_private_key');
   if (!encrypted) throw new Error('No private key found');
-  
   try {
-    return decrypt(encrypted, pin);
+    return decryptData(JSON.parse(encrypted), pin);
   } catch {
     throw new Error('Invalid PIN');
   }

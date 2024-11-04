@@ -27,7 +27,7 @@ export function useWalletConnect({
   const initWallet = useCallback(async () => {
     try {
       const core = new Core({
-        projectId: "b479590efeefdf98a5416e8cf2d48ebc"
+        projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
       });
 
       const wallet = await Web3Wallet.init({
@@ -38,6 +38,31 @@ export function useWalletConnect({
           url: window.location.origin,
           icons: ["https://your-wallet-icon.com"]
         }
+      });
+
+      // 注册你的钱包到 WalletConnect Registry
+      await wallet.registerWallet({
+        metadata: {
+          name: "Your Wallet Name",
+          description: "Your Wallet Description",
+          url: process.env.NEXT_PUBLIC_WALLET_URL,
+          icons: ["https://your-wallet-icon.com"],
+          redirect: {
+            native: "yourwallet://",
+            universal: process.env.NEXT_PUBLIC_WALLET_URL
+          }
+        },
+        // 支持的链
+        chains: ["eip155:1", "eip155:5", "eip155:11155111"],
+        // 支持的方法
+        methods: [
+          "eth_sendTransaction",
+          "eth_signTransaction",
+          "personal_sign",
+          "eth_sign"
+        ],
+        // 支持的事件
+        events: ["chainChanged", "accountsChanged"]
       });
 
       setWeb3wallet(wallet);
@@ -57,10 +82,11 @@ export function useWalletConnect({
       const { id, params } = proposal;
       
       try {
-        // 请求用户授权
+        // 显示权限确认对话框
         const approved = await onPermissionRequest(params.proposer.metadata.url);
         
         if (approved) {
+          // 用户同意后，配置支持的功能
           const namespaces = buildApprovedNamespaces({
             proposal: params,
             supportedNamespaces: {
@@ -78,22 +104,16 @@ export function useWalletConnect({
             }
           });
 
+          // 批准会话
           const session = await wallet.approveSession({
             id,
             namespaces
           });
 
+          // 更新连接状态
           setActiveSessions(prev => new Map(prev.set(session.topic, session)));
           setPeerMeta(params.proposer.metadata);
           setConnected(true);
-        } else {
-          await wallet.rejectSession({
-            id,
-            reason: {
-              code: 4001,
-              message: "用户拒绝连接"
-            }
-          });
         }
       } catch (error) {
         console.error("处理连接请求失败:", error);

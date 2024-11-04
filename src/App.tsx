@@ -23,6 +23,7 @@ import { Loading } from "./components/Loading";
 import { Skeleton } from "./components/Skeleton";
 import { SendModal } from "./components/SendModal";
 import { WalletConnectSession } from "./components/WalletConnectSession";
+import { useWalletConnect } from "./hooks/useWalletConnect";
 
 function App() {
   const { t } = useTranslation();
@@ -63,18 +64,13 @@ function App() {
   useEffect(() => {
     const initializeWallet = async () => {
       try {
-        const storedPin = localStorage.getItem("wallet_pin");
-        if (storedPin) {
-          setPin(storedPin);
-          const storedWallet = getStoredWallet(storedPin);
-          if (storedWallet) {
-            setWallet((prev) => ({
-              ...prev,
-              address: storedWallet.address,
-              privateKey: storedWallet.privateKey,
-              mnemonic: storedWallet.mnemonic,
-            }));
-          }
+        // 不再从 localStorage 获取 PIN
+        const storedEncryptedData = localStorage.getItem("mnemonic");
+        if (storedEncryptedData) {
+          // 等待用户输入 PIN 进行解密
+          setShowPinSetup(false);
+        } else {
+          setIsInitializing(false);
         }
       } catch (error) {
         console.error("初始化钱包失败:", error);
@@ -106,7 +102,6 @@ function App() {
 
   const handlePinSet = (newPin: string) => {
     setPin(newPin);
-    localStorage.setItem("wallet_pin", newPin);
 
     if (isCreatingWallet) {
       const newWallet = generateWallet(newPin);
@@ -173,8 +168,6 @@ function App() {
   const handleDeleteAccount = () => {
     localStorage.removeItem("mnemonic");
     localStorage.removeItem("privateKey");
-    localStorage.removeItem("has_pin");
-    localStorage.removeItem("wallet_pin");
 
     setWallet({
       address: null,
@@ -195,6 +188,55 @@ function App() {
       setShowSendModal(false);
     } catch (error) {
       console.error("发送交易失败:", error);
+    }
+  };
+
+  useEffect(() => {
+    // 处理 WalletConnect URI
+    const handleWalletConnectUri = (uri: string) => {
+      if (uri.startsWith('wc:')) {
+        // 如果用户未登录，先保存 URI
+        if (!wallet.address) {
+          localStorage.setItem('pending_wc_uri', uri);
+          return;
+        }
+        
+        // 已登录则直接处理连接请求
+        handleWalletConnectSession(uri);
+      }
+    };
+
+    // 检查 URL 参数中的 WalletConnect URI
+    const params = new URLSearchParams(window.location.search);
+    const uri = params.get('wc');
+    if (uri) {
+      handleWalletConnectUri(uri);
+    }
+
+    // 检查是否有待处理的连接请求
+    const pendingUri = localStorage.getItem('pending_wc_uri');
+    if (pendingUri && wallet.address) {
+      handleWalletConnectSession(pendingUri);
+      localStorage.removeItem('pending_wc_uri');
+    }
+  }, [wallet.address]);
+
+  const handleWalletConnectSession = async (uri: string) => {
+    try {
+      const { web3wallet } = useWalletConnect({
+        address: wallet.address,
+        network: wallet.network,
+        onPermissionRequest: handlePermissionRequest
+      });
+
+      if (!web3wallet) {
+        throw new Error('WalletConnect not initialized');
+      }
+
+      // 配对连接
+      await web3wallet.pair({ uri });
+    } catch (error) {
+      console.error('Failed to handle WalletConnect session:', error);
     }
   };
 

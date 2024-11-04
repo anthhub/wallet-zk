@@ -68,13 +68,13 @@ export function decryptData(encryptedData: EncryptedData, pin: string): string {
     const result = decrypted.toString(CryptoJS.enc.Utf8);
 
     if (!result) {
-      throw new Error("PIN码错误或数据已损坏");
+      return null;
     }
 
     return result;
   } catch (error) {
     console.error("解密失败:", error);
-    throw new Error("解密失败，请检查PIN码是否正确");
+    return null;
   }
 }
 
@@ -108,6 +108,9 @@ export function getSecureData(key: string, pin: string): string | null {
   } catch (error) {
     if (error instanceof SyntaxError) {
       console.error("存储的数据格式无效:", error);
+      return null;
+    }
+    if (error instanceof Error && error.message.includes("解密失败")) {
       return null;
     }
     throw error;

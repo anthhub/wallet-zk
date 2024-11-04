@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
-import { KeyRound, Trash2, AlertTriangle } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { PinVerification } from './PinVerification';
+import React, { useState } from "react";
+import { KeyRound, Trash2, AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { PinVerification } from "./PinVerification";
 
 interface AccountManagerProps {
   onDeleteAccount: () => void;
   onViewMnemonic: () => void;
 }
 
-export function AccountManager({ onDeleteAccount, onViewMnemonic }: AccountManagerProps) {
+export function AccountManager({
+  onDeleteAccount,
+  onViewMnemonic,
+}: AccountManagerProps) {
   const { t } = useTranslation();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showPinForDelete, setShowPinForDelete] = useState(false);
@@ -45,14 +48,14 @@ export function AccountManager({ onDeleteAccount, onViewMnemonic }: AccountManag
           className="flex items-center space-x-2 px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm"
         >
           <KeyRound className="h-4 w-4" />
-          <span>{t('account.viewMnemonic')}</span>
+          <span>{t("account.viewMnemonic")}</span>
         </button>
         <button
           onClick={handleDeleteRequest}
           className="flex items-center space-x-2 px-3 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-sm"
         >
           <Trash2 className="h-4 w-4" />
-          <span>{t('account.deleteAccount')}</span>
+          <span>{t("account.deleteAccount")}</span>
         </button>
       </div>
 
@@ -64,10 +67,10 @@ export function AccountManager({ onDeleteAccount, onViewMnemonic }: AccountManag
               <AlertTriangle className="h-6 w-6 text-red-400 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-bold text-red-400">
-                  {t('account.deleteConfirm')}
+                  {t("account.deleteConfirm")}
                 </h3>
                 <p className="mt-2 text-gray-400">
-                  {t('account.deleteWarning')}
+                  {t("account.deleteWarning")}
                 </p>
               </div>
             </div>
@@ -76,13 +79,13 @@ export function AccountManager({ onDeleteAccount, onViewMnemonic }: AccountManag
                 onClick={() => setShowDeleteConfirm(false)}
                 className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg"
               >
-                {t('common.cancel')}
+                {t("common.cancel")}
               </button>
               <button
                 onClick={handleDeleteConfirm}
                 className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg"
               >
-                {t('common.confirm')}
+                {t("common.confirm")}
               </button>
             </div>
           </div>
@@ -92,8 +95,8 @@ export function AccountManager({ onDeleteAccount, onViewMnemonic }: AccountManag
       {/* PIN验证对话框 */}
       {showPinForDelete && (
         <PinVerification
-          title={t('account.verifyPin')}
-          message={t('account.enterPinDelete')}
+          title={t("account.verifyPin")}
+          message={t("account.enterPinDelete")}
           onVerified={handlePinVerifiedForDelete}
           onCancel={() => setShowPinForDelete(false)}
         />
@@ -101,12 +104,12 @@ export function AccountManager({ onDeleteAccount, onViewMnemonic }: AccountManag
 
       {showPinForMnemonic && (
         <PinVerification
-          title={t('account.verifyPin')}
-          message={t('account.enterPinMnemonic')}
+          title={t("account.verifyPin")}
+          message={t("account.enterPinMnemonic")}
           onVerified={handlePinVerifiedForMnemonic}
           onCancel={() => setShowPinForMnemonic(false)}
         />
       )}
     </>
   );
-} 
+}
