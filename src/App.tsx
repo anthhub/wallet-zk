@@ -98,7 +98,7 @@ function App() {
   }, [nfts]);
 
   const handleCreateWallet = async () => {
-    setIsLoading(true);
+    // setIsLoading(true);
     setIsCreatingWallet(true);
     setShowPinSetup(true);
   };
@@ -274,7 +274,7 @@ function App() {
                 </p>
                 <p className="text-sm text-gray-400">{t("wallet.balance")}</p>
               </div>
-              
+
               <div className="mt-6 pt-6 border-t border-gray-800">
                 <AccountManager
                   onDeleteAccount={handleDeleteAccount}
@@ -381,14 +381,14 @@ function App() {
         )}
       </main>
 
-      {(tokensLoading || nftsLoading) && (
+      {/* {(tokensLoading || nftsLoading) && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="text-center">
             <Loading size="lg" />
             <p className="mt-4 text-gray-400">{t("common.loading")}</p>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
