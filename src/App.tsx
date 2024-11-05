@@ -151,7 +151,7 @@ function App() {
 
   // 初始化语言设置
   useEffect(() => {
-    const savedLang = localStorage.getItem('preferred_language');
+    const savedLang = localStorage.getItem("preferred_language");
     if (savedLang && savedLang !== i18n.language) {
       i18n.changeLanguage(savedLang);
     }
@@ -164,7 +164,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      local
       <WalletHeader
         address={wallet.address}
         network={wallet.network}
