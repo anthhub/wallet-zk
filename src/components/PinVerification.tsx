@@ -31,7 +31,7 @@ export function PinVerification({
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
-        <h3 className="text-lg font-bold mb-4">{t("wallet.enterPin")}</h3>
+        <h3 className="text-lg font-bold mb-4">{t("transaction.enterPin")}</h3>
         <input
           type="password"
           className="w-full bg-gray-700 rounded p-2 mb-4"

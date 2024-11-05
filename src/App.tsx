@@ -174,7 +174,10 @@ function App() {
         {!wallet.address ? (
           <WelcomeScreen
             onCreateWallet={handleCreateWallet}
-            onStartImport={() => setShowImport(true)}
+            onStartImport={() => {
+              setShowImport(true);
+              setShowPinSetup(true);
+            }}
           />
         ) : (
           <WalletDashboard
