@@ -14,13 +14,13 @@ export function WalletConnectSession({
   onPermissionRequest,
 }: WalletConnectSessionProps) {
   const { t } = useTranslation();
-  const { connected, pendingRequest, peerMeta, disconnect } = useWalletConnect({
+  const { isConnected, disconnect } = useWalletConnect({
     address,
     network,
     onPermissionRequest,
   });
 
-  if (!connected && !peerMeta) return null;
+  if (!isConnected) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-800">
@@ -29,10 +29,10 @@ export function WalletConnectSession({
           <div className="flex items-center space-x-2">
             <Shield className="h-5 w-5 text-blue-400" />
             <h3 className="text-lg font-bold">
-              {connected ? t("wallet.connected") : t("wallet.connecting")}
+              {isConnected ? t("wallet.connected") : t("wallet.connecting")}
             </h3>
           </div>
-          {connected && (
+          {isConnected && (
             <button
               onClick={disconnect}
               className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
@@ -41,20 +41,6 @@ export function WalletConnectSession({
             </button>
           )}
         </div>
-
-        {peerMeta && (
-          <div className="bg-gray-800 rounded-lg p-4">
-            <p className="font-bold">{peerMeta.name}</p>
-            <p className="text-sm text-gray-400 mt-1">{peerMeta.description}</p>
-            <p className="text-sm text-gray-400 mt-1">{peerMeta.url}</p>
-          </div>
-        )}
-
-        {pendingRequest && (
-          <div className="bg-yellow-500/10 text-yellow-500 rounded-lg p-4">
-            {t("wallet.pendingRequest")}
-          </div>
-        )}
       </div>
     </div>
   );

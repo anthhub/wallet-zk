@@ -56,7 +56,7 @@ function App() {
     });
   };
 
-  const { handleUri } = useWalletConnectHandler({
+  useWalletConnectHandler({
     wallet,
     handlePermissionRequest: async (origin) => {
       // 实现权限请求处理逻辑
@@ -155,13 +155,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      local
       <WalletHeader
         address={wallet.address}
         network={wallet.network}
         onNetworkChange={handleNetworkChange}
         onPermissionRequest={handlePermissionRequest}
       />
-
       <main className="max-w-md mx-auto px-4 py-6">
         {!wallet.address ? (
           <WelcomeScreen
@@ -198,7 +198,6 @@ function App() {
           }}
         />
       </main>
-
       <WalletConnectSession
         address={wallet.address}
         network={wallet.network}

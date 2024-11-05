@@ -1,21 +1,22 @@
-import { ViewMnemonic } from "./ViewMnemonic"
-import { PinSetup } from "./PinSetup"
-import { ImportWallet } from "./ImportWallet"
-import { SendModal } from "./SendModal"
-import { DappPermissionDialog } from "./DappPermission"
-import type { WalletState } from "../types/wallet"
+import { ViewMnemonic } from "./ViewMnemonic";
+import { PinSetup } from "./PinSetup";
+import { ImportWallet } from "./ImportWallet";
+import { SendModal } from "./SendModal";
+import { DappPermissionDialog } from "./DappPermission";
+import type { ImportedWallet } from "../types/modal";
+import type { WalletState } from "../types/wallet";
 
 interface ModalsContainerProps {
-  wallet: WalletState
-  pin: string | null
-  showImport: boolean
-  showMnemonic: boolean
-  showPinSetup: boolean
-  showSendModal: boolean
-  pendingPermission: string | null
-  onImport: (imported: { address: string; privateKey: string; mnemonic: string }) => void
-  onPinSet: (pin: string) => void
-  onCloseModals: () => void
+  wallet: WalletState;
+  pin: string | null;
+  showImport: boolean;
+  showMnemonic: boolean;
+  showPinSetup: boolean;
+  showSendModal: boolean;
+  pendingPermission: string | null;
+  onImport: (imported: ImportedWallet) => void;
+  onPinSet: (pin: string) => void;
+  onCloseModals: () => void;
 }
 
 export function ModalsContainer({
@@ -28,38 +29,26 @@ export function ModalsContainer({
   pendingPermission,
   onImport,
   onPinSet,
-  onCloseModals
+  onCloseModals,
 }: ModalsContainerProps) {
   return (
     <>
       {showImport && pin && (
-        <ImportWallet
-          onImport={onImport}
-          onClose={onCloseModals}
-          pin={pin}
-        />
+        <ImportWallet onImport={onImport} onClose={onCloseModals} pin={pin} />
       )}
 
       {showMnemonic && pin && (
-        <ViewMnemonic 
-          pin={pin} 
-          onClose={onCloseModals} 
-        />
+        <ViewMnemonic pin={pin} onClose={onCloseModals} />
       )}
 
-      {showPinSetup && (
-        <PinSetup
-          onPinSet={onPinSet}
-          onClose={onCloseModals}
-        />
-      )}
+      {showPinSetup && <PinSetup onPinSet={onPinSet} onClose={onCloseModals} />}
 
       {showSendModal && (
         <SendModal
           onClose={onCloseModals}
           onSend={() => {
             // TODO: Implement send
-            onCloseModals()
+            onCloseModals();
           }}
           balance={wallet.balance}
         />
@@ -68,13 +57,17 @@ export function ModalsContainer({
       {pendingPermission && (
         <DappPermissionDialog
           origin={pendingPermission}
+          metadata={{
+            name: "DApp",
+            url: "https://example.com",
+          }}
           onApprove={() => {
             // TODO: Implement approve
-            onCloseModals()
+            onCloseModals();
           }}
           onReject={onCloseModals}
         />
       )}
     </>
-  )
-} 
+  );
+}
