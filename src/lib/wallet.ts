@@ -2,6 +2,12 @@ import { generateMnemonic, mnemonicToSeedSync } from "bip39";
 import { HDKey } from "@scure/bip32";
 import { privateKeyToAccount } from "viem/accounts";
 import { storeSecureData, getSecureData } from "./crypto";
+import { Buffer } from 'buffer';
+
+// 添加全局 Buffer
+if (typeof window !== 'undefined') {
+  window.Buffer = window.Buffer || Buffer;
+}
 
 export const generateWallet = (pin: string) => {
   const mnemonic = generateMnemonic();

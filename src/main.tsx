@@ -1,4 +1,7 @@
 import "process";
+import { Buffer } from "buffer";
+globalThis.Buffer = Buffer;
+
 // 其他导入...
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

@@ -8,6 +8,7 @@ export function LanguageSelector() {
   const toggleLanguage = () => {
     const nextLang = i18n.language === 'zh' ? 'en' : 'zh';
     i18n.changeLanguage(nextLang);
+    localStorage.setItem('preferred_language', nextLang);
   };
 
   return (
@@ -16,7 +17,9 @@ export function LanguageSelector() {
       className="flex items-center space-x-1 px-2 py-1 rounded-lg bg-gray-700/50 hover:bg-gray-600/50"
     >
       <Globe className="h-4 w-4" />
-      <span className="text-sm">{i18n.language.toUpperCase()}</span>
+      <span className="text-sm">
+        {i18n.language === 'zh' ? '中文' : 'EN'}
+      </span>
     </button>
   );
 } 

@@ -15,15 +15,22 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ["qr-scanner"],
+    esbuildOptions: {
+      define: {
+        global: 'globalThis'
+      }
+    }
   },
   define: {
     global: "globalThis",
+    'process.env': {},
   },
   resolve: {
     alias: {
       process: "process/browser",
       stream: "stream-browserify",
       util: "util",
+      buffer: 'buffer',
     },
   },
 

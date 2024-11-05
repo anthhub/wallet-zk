@@ -16,6 +16,7 @@ import { useWalletConnectHandler } from "./hooks/useWalletConnectHandler";
 function App() {
   const { t } = useTranslation();
   const storage = useWalletStorage();
+  const { i18n } = useTranslation();
 
   // 初始化钱包状态
   const [wallet, setWallet] = useState<WalletState>(() => {
@@ -147,6 +148,14 @@ function App() {
     });
     setPin(null);
   };
+
+  // 初始化语言设置
+  useEffect(() => {
+    const savedLang = localStorage.getItem('preferred_language');
+    if (savedLang && savedLang !== i18n.language) {
+      i18n.changeLanguage(savedLang);
+    }
+  }, [i18n]);
 
   // 渲染加载状态
   if (isInitializing) {
